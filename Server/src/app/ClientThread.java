@@ -9,7 +9,7 @@ import java.net.Socket;
 class ClientThread extends Thread {
     private Socket socket = null ;
     private boolean connected=true;
-    private boolean loggedIn=false;
+    private boolean autentificat=false;
     private boolean welcomeMessageIsPrinted=false;
     private String welcomeMessage = "[Server] Bun venit! Introduceti comanda de INREGISTRARE, AUTENTIFICARE sau IESIRE:";
     public ClientThread (Socket socket) throws IOException { this.socket = socket ; }
@@ -23,9 +23,15 @@ class ClientThread extends Thread {
                 if(welcomeMessageIsPrinted==false) {
                     out.println(welcomeMessage);
                     out.flush();
+                    String comandaClient = in.readLine();
+                    handleCommand(comandaClient);
                     welcomeMessageIsPrinted=true;
                 }
                 else {
+                    String comandaClient = in.readLine();
+                    handleCommand(comandaClient);
+                }
+                while(autentificat){
                     String comandaClient = in.readLine();
                     handleCommand(comandaClient);
                 }
@@ -39,11 +45,14 @@ class ClientThread extends Thread {
         }
     }
     public void handleCommand(String command) throws IOException {
-        if(command.equals("INREGISTRARE")){
+        if(!autentificat && command.equals("INREGISTRARE")){
             inregistrare();
         }
-        else if(command.equals("AUTENTIFICARE")){
+        else if(!autentificat && command.equals("AUTENTIFICARE")){
             autentificare();
+        }
+        else if(autentificat && command.equals("DELOGARE")){
+             delogare();
         }
         else if(command.equals("IESIRE")){
             iesire();
@@ -68,7 +77,16 @@ class ClientThread extends Thread {
     public void autentificare() throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         PrintWriter out = new PrintWriter(socket.getOutputStream());
-        String mesajServer = "[Server] autentificare...";
+        String mesajServer = "[Server] Autentificat cu succes! Introduceti comanda:";
+        autentificat=true;
+        out.println(mesajServer);
+        out.flush();
+    }
+    public void delogare() throws IOException {
+        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        PrintWriter out = new PrintWriter(socket.getOutputStream());
+        String mesajServer = "[Server] Delogat cu succes! Introduceti comanda:";
+        autentificat=false;
         out.println(mesajServer);
         out.flush();
     }

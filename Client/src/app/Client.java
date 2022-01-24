@@ -19,13 +19,15 @@ public class Client {
                 BufferedReader in = new BufferedReader (
                         new InputStreamReader(socket.getInputStream())) ) {
             while(true) {
+                String response = in.readLine();
+                System.out.println(response);
                 Scanner scanner = new Scanner(System.in);
                 String request = scanner.nextLine();
                 // Send a request to the server
                 out.println(request);
-                // Wait the response from the server ("Hello World!")
-                String response = in.readLine();
-                System.out.println(response);
+                if(request.equals("IESIRE")){
+                    break;
+                }
             }
         } catch (UnknownHostException e) {
             System.err.println("No server listening... " + e);

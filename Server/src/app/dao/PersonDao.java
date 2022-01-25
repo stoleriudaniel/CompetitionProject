@@ -64,7 +64,7 @@ public class PersonDao {
             System.out.println("Inserare esuata!\n");
         }
     }
-    public boolean isAdmin(String userName, String password, Connection conn){
+    public static boolean isAdmin(String userName, String password, Connection conn){
         String userNameAdmin="";
         String passwordAdmin ="";
         try {
@@ -80,7 +80,7 @@ public class PersonDao {
         }
         return (userName.equals(userNameAdmin) && password.equals(passwordAdmin));
     }
-    public boolean isValidAccount(String username, String password, Connection conn){
+    public static boolean isValidAccount(String username, String password, Connection conn){
         boolean validAcc=false;
         try {
             Statement statement = conn.createStatement();
@@ -100,7 +100,7 @@ public class PersonDao {
         return validAcc;
     }
 
-    public boolean userExists(String username, String password, Connection conn){
+    public static boolean userExists(String username, String password, Connection conn){
         boolean exists=false;
         try {
             Statement statement = conn.createStatement();

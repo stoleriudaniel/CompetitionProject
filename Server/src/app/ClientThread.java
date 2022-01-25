@@ -1,5 +1,7 @@
 package app;
 
+import app.dao.PersonDao;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -81,11 +83,11 @@ class ClientThread extends Thread {
         String mesajServer = "[Server] Introduceti username-ul:";
         out.println(mesajServer);
         out.flush();
-        String mesajClient = in.readLine();
+        String username = in.readLine();
         mesajServer = "[Server] Introduceti parola:";
         out.println(mesajServer);
         out.flush();
-        mesajClient = in.readLine();
+        String password = in.readLine();
         mesajServer = "[Server] Autentificat cu succes!";
         out.println(mesajServer);
         out.flush();

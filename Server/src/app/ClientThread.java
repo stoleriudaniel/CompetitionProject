@@ -7,13 +7,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.sql.Connection;
 
 class ClientThread extends Thread {
     private Socket socket = null ;
     private boolean connected=true;
     private boolean autentificat=false;
     private boolean welcomeMessageIsPrinted=false;
-    private String username="";
+    private String usernameLogged="";
     private String welcomeMessage = "[Server] Bun venit! Introduceti comanda de INREGISTRARE, AUTENTIFICARE sau IESIRE:";
     public ClientThread (Socket socket) throws IOException { this.socket = socket ; }
     public void run () {
@@ -68,12 +69,28 @@ class ClientThread extends Thread {
         String mesajServer = "[Server] Introduceti username-ul:";
         out.println(mesajServer);
         out.flush();
-        String mesajClient = in.readLine();
+        String username = in.readLine();
         mesajServer = "[Server] Introduceti parola:";
         out.println(mesajServer);
         out.flush();
-        mesajClient = in.readLine();
-        mesajServer = "[Server] Inregistrat cu succes! Introduceti comanda de INREGISTRARE, AUTENTIFICARE sau IESIRE:";
+        String password = in.readLine();
+        mesajServer = "[Server] Introduceti id-ul echipei:";
+        out.println(mesajServer);
+        out.flush();
+        String idEchipaString = in.readLine();
+        int idEchipaInt = Integer.parseInt(idEchipaString);
+        System.out.println("nrMembrii: id=" + idEchipaInt +" " + PersonDao.numarPersoaneEchipa(idEchipaInt,Singleton.getConnection()));
+        if(PersonDao.userExists(username, Singleton.getConnection())) {
+            mesajServer = "[Server] Inregistrare esuata! Userul exista deja. Introduceti comanda de INREGISTRARE, AUTENTIFICARE sau IESIRE:";
+        } else if(password.length()==0){
+            mesajServer = "[Server] Parola invalida! Introduceti comanda de INREGISTRARE, AUTENTIFICARE sau IESIRE:";
+        } else if(PersonDao.numarPersoaneEchipa(idEchipaInt,Singleton.getConnection())>=5){
+            mesajServer = "[Server] Inregistrare esuata! Echipa este plina. Introduceti comanda de INREGISTRARE, AUTENTIFICARE sau IESIRE:";
+        }
+        else {
+            PersonDao.insert(username,password, idEchipaInt, Singleton.getConnection());
+            mesajServer = "[Server] Inregistrat cu succes!";
+        }
         out.println(mesajServer);
         out.flush();
     }
@@ -88,7 +105,11 @@ class ClientThread extends Thread {
         out.println(mesajServer);
         out.flush();
         String password = in.readLine();
-        mesajServer = "[Server] Autentificat cu succes!";
+        if(PersonDao.isValidAccount(username,password,Singleton.getConnection())) {
+            mesajServer = "[Server] Autentificat cu succes!";
+        } else {
+            mesajServer = "[Server] Autentificare esuata! Introduceti comanda de INREGISTRARE, AUTENTIFICARE sau IESIRE:";
+        }
         out.println(mesajServer);
         out.flush();
     }
@@ -97,6 +118,7 @@ class ClientThread extends Thread {
         PrintWriter out = new PrintWriter(socket.getOutputStream());
         String mesajServer = "[Server] Delogat cu succes! Introduceti comanda:";
         autentificat=false;
+        usernameLogged="";
         out.println(mesajServer);
         out.flush();
     }

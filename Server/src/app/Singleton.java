@@ -5,24 +5,18 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class Singleton {
-
-    private static Connection con = null;
-
-    static
+    public static Connection getConnection()
     {
         String url = "jdbc:mysql://localhost:3306/mydb";
         String user = "root";
         String pass = "pkk990";
-        try {
+        try{
             Class.forName("com.mysql.cj.jdbc.Driver");
-            con = DriverManager.getConnection(url, user, pass);
+            return DriverManager.getConnection(url, user, pass);
+        }catch(Exception ex){
+            System.out.println(ex.getMessage());
+            System.out.println("couldn't connect!");
+            throw new RuntimeException(ex);
         }
-        catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    public static Connection getConnection()
-    {
-        return con;
     }
 }

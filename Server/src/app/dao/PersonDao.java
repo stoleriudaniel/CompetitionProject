@@ -10,14 +10,15 @@ import java.util.List;
 public class PersonDao {
 
 
-    private static String sqlInsertUser = "INSERT INTO Persons(username,password) VALUES(?,?);";
+    private static String sqlInsertUser = "INSERT INTO Persons(username,password,id_echipa) VALUES(?,?,?);";
     private static String sqlRemoveUser = "DELETE FROM Persons WHERE username=?";
     private static String sqlInsertAdmin = "INSERT INTO admin(username, password) VALUES(?,?);";
-    public static void insert(String userName, String password, Connection conn){
+    public static void insert(String userName, String password, int idEchipa, Connection conn){
         try{
             PreparedStatement stmt = conn.prepareStatement(sqlInsertUser);
             stmt.setString(1,userName);
             stmt.setString(2,password);
+            stmt.setInt(3,idEchipa);
             stmt.execute();
             conn.close();
         } catch (SQLException e) {
@@ -50,6 +51,7 @@ public class PersonDao {
             }
         } catch (Exception e){
             System.out.println("Exceptie la read");
+            System.out.println(e.getCause());
         }
         return persons;
     }
@@ -62,6 +64,7 @@ public class PersonDao {
             conn.close();
         } catch (SQLException e) {
             System.out.println("Inserare esuata!\n");
+            System.out.println(e.getCause());
         }
     }
     public static boolean isAdmin(String userName, String password, Connection conn){
@@ -76,7 +79,7 @@ public class PersonDao {
                 passwordAdmin = resultSet.getString("password");
             }
         } catch (Exception e){
-            System.out.println("Exceptie la read");
+            System.out.println("Exceptie la isAdmin");
         }
         return (userName.equals(userNameAdmin) && password.equals(passwordAdmin));
     }
@@ -95,12 +98,13 @@ public class PersonDao {
                 }
             }
         } catch (Exception e){
-            System.out.println("Exceptie la read");
+            System.out.println("Exceptie la isValidAccount");
+            System.out.println(e.getCause());
         }
         return validAcc;
     }
 
-    public static boolean userExists(String username, String password, Connection conn){
+    public static boolean userExists(String username, Connection conn){
         boolean exists=false;
         try {
             Statement statement = conn.createStatement();
@@ -114,8 +118,27 @@ public class PersonDao {
                 }
             }
         } catch (Exception e){
-            System.out.println("Exceptie la read");
+            System.out.println("exceptie userExists");
+            System.out.println(e.getCause());
         }
         return exists;
+    }
+
+    public static int numarPersoaneEchipa(int idEchipa, Connection conn){
+        int count=0;
+        try {
+            Statement statement = conn.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT id_echipa FROM persons");
+            while (resultSet.next()) {
+                int idFound = resultSet.getInt("id_echipa");
+                if(idEchipa == idFound){
+                    count++;
+                }
+            }
+        } catch (Exception e){
+            System.out.println("Exceptie la numarPersoaneEchipa");
+            System.out.println(e.getCause());
+        }
+        return count;
     }
 }

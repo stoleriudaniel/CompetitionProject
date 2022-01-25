@@ -19,7 +19,7 @@ public class StageDao {
             }
             conn.close();
         } catch (SQLException e) {
-            System.out.println("Inserare esuata!\n");
+            System.out.println("Exceptie la insertPersons!\n");
         }
     }
 
@@ -31,7 +31,7 @@ public class StageDao {
             stmt.execute();
             conn.close();
         } catch (SQLException e) {
-            System.out.println("Inserare esuata!\n");
+            System.out.println("Exceptie la insertScore!\n");
         }
     }
 

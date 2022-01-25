@@ -12,6 +12,7 @@ public class PersonDao {
 
     private static String sqlInsertUser = "INSERT INTO Persons(username,password) VALUES(?,?);";
     private static String sqlRemoveUser = "DELETE FROM Persons WHERE username=?";
+    private static String sqlInsertAdmin = "INSERT INTO admin(username, password) VALUES(?,?);";
     public static void insert(String userName, String password, Connection conn){
         try{
             PreparedStatement stmt = conn.prepareStatement(sqlInsertUser);
@@ -51,5 +52,16 @@ public class PersonDao {
             System.out.println("Exceptie la read");
         }
         return persons;
+    }
+    public static void insertAdmin(String userName, String password, Connection conn){
+        try{
+            PreparedStatement stmt = conn.prepareStatement(sqlInsertAdmin);
+            stmt.setString(1,userName);
+            stmt.setString(2,password);
+            stmt.execute();
+            conn.close();
+        } catch (SQLException e) {
+            System.out.println("Inserare esuata!\n");
+        }
     }
 }

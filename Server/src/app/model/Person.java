@@ -14,6 +14,11 @@ public class Person {
         this.userName = userName;
         this.password = password;
     }
+    public Person(int id, String userName, int idEchipa){
+        this.id=id;
+        this.userName=userName;
+        this.idEchipa=idEchipa;
+    }
 
     public void setId(int id) {
         this.id = id;

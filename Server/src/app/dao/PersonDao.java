@@ -1,6 +1,11 @@
 package app.dao;
 
+import app.model.Person;
+
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class PersonDao {
 
@@ -28,17 +33,23 @@ public class PersonDao {
             System.out.println("Stergere esuata!\n");
         }
     }
-    public static void read(Connection conn){
+    public static List<Person> read(Connection conn){
+        List<Person> persons = new ArrayList<>();
         try {
             Statement statement = conn.createStatement();
 
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM persons");
+            ResultSet resultSet = statement.executeQuery("SELECT id, username, id_echipa FROM persons");
 
             while (resultSet.next()) {
-                System.out.println(resultSet.getString("username"));
+                int id = resultSet.getInt("id");
+                String userName = resultSet.getString("username");
+                int idEchipa = resultSet.getInt("id_echipa");
+                Person person = new Person(id,userName,idEchipa);
+                persons.add(person);
             }
         } catch (Exception e){
-            e.printStackTrace();
+            System.out.println("Exceptie la read");
         }
+        return persons;
     }
 }

@@ -7,7 +7,7 @@ import java.util.List;
 
 public class StageDao {
     private static String sqlInsertPerson = "INSERT INTO clasament_etapa(id_persoana, username) VALUES(?,?);";
-    private static String sqlInsertScore = "INSERT INTO clasament_etapa(id_persoana, username, scor) VALUES(?,?,?);";
+    private static String sqlInsertScore = "UPDATE clasament_etapa SET scor=? WHERE username=?;";
     public static void insertPersons(Connection conn){
         try{
             List<Person> persons = PersonDao.read(conn);
@@ -23,12 +23,11 @@ public class StageDao {
         }
     }
 
-    public static void insertScore(int idPersoana, String username, float score, Connection conn){
+    public static void insertScore(String username, float score, Connection conn){
         try{
             PreparedStatement stmt = conn.prepareStatement(sqlInsertScore);
-            stmt.setInt(1,idPersoana);
-            stmt.setString(2,username);
-            stmt.setFloat(3,score);
+            stmt.setString(1,username);
+            stmt.setFloat(2,score);
             stmt.execute();
             conn.close();
         } catch (SQLException e) {

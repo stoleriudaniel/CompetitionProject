@@ -80,4 +80,42 @@ public class PersonDao {
         }
         return (userName.equals(userNameAdmin) && password.equals(passwordAdmin));
     }
+    public boolean isValidAccount(String username, String password, Connection conn){
+        boolean validAcc=false;
+        try {
+            Statement statement = conn.createStatement();
+
+            ResultSet resultSet = statement.executeQuery("SELECT username, password FROM persons");
+
+            while (resultSet.next()) {
+                String usernameFound = resultSet.getString("username");
+                String passwordFound = resultSet.getString("password");
+                if(usernameFound.equals(username) && passwordFound.equals(password)){
+                    validAcc=true;
+                }
+            }
+        } catch (Exception e){
+            System.out.println("Exceptie la read");
+        }
+        return validAcc;
+    }
+
+    public boolean userExists(String username, String password, Connection conn){
+        boolean exists=false;
+        try {
+            Statement statement = conn.createStatement();
+
+            ResultSet resultSet = statement.executeQuery("SELECT username FROM persons");
+
+            while (resultSet.next()) {
+                String usernameFound = resultSet.getString("username");
+                if(usernameFound.equals(username)){
+                    exists=true;
+                }
+            }
+        } catch (Exception e){
+            System.out.println("Exceptie la read");
+        }
+        return exists;
+    }
 }

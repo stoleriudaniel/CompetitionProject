@@ -11,6 +11,7 @@ class ClientThread extends Thread {
     private boolean connected=true;
     private boolean autentificat=false;
     private boolean welcomeMessageIsPrinted=false;
+    private String username="";
     private String welcomeMessage = "[Server] Bun venit! Introduceti comanda de INREGISTRARE, AUTENTIFICARE sau IESIRE:";
     public ClientThread (Socket socket) throws IOException { this.socket = socket ; }
     public void run () {
@@ -77,8 +78,15 @@ class ClientThread extends Thread {
     public void autentificare() throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         PrintWriter out = new PrintWriter(socket.getOutputStream());
-        String mesajServer = "[Server] Autentificat cu succes! Introduceti comanda:";
-        autentificat=true;
+        String mesajServer = "[Server] Introduceti username-ul:";
+        out.println(mesajServer);
+        out.flush();
+        String mesajClient = in.readLine();
+        mesajServer = "[Server] Introduceti parola:";
+        out.println(mesajServer);
+        out.flush();
+        mesajClient = in.readLine();
+        mesajServer = "[Server] Autentificat cu succes!";
         out.println(mesajServer);
         out.flush();
     }

@@ -64,4 +64,20 @@ public class PersonDao {
             System.out.println("Inserare esuata!\n");
         }
     }
+    public boolean isAdmin(String userName, String password, Connection conn){
+        String userNameAdmin="";
+        String passwordAdmin ="";
+        try {
+            Statement statement = conn.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT username, password FROM admin");
+
+            while (resultSet.next()) {
+                userNameAdmin = resultSet.getString("username");
+                passwordAdmin = resultSet.getString("password");
+            }
+        } catch (Exception e){
+            System.out.println("Exceptie la read");
+        }
+        return (userName.equals(userNameAdmin) && password.equals(passwordAdmin));
+    }
 }

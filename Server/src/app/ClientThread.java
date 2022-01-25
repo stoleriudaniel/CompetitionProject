@@ -1,6 +1,7 @@
 package app;
 
 import app.dao.PersonDao;
+import app.dao.StageDao;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -57,6 +58,9 @@ class ClientThread extends Thread {
         }
         else if(autentificat && command.equals("DELOGARE")){
              delogare();
+        }
+        else if(autentificat && command.equals("INSERARE_SCOR")){
+            inserareScor();
         }
         else if(command.equals("IESIRE")){
             iesire();
@@ -121,6 +125,22 @@ class ClientThread extends Thread {
         usernameLogged="";
         out.println(mesajServer);
         out.flush();
+    }
+    public void inserareScor() throws IOException {
+        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        PrintWriter out = new PrintWriter(socket.getOutputStream());
+        String mesajServer = "[Server] Introduceti id-ul etapei:";
+        out.println(mesajServer);
+        out.flush();
+        String idEtapaString = in.readLine();
+        int idEtapaInt = Integer.parseInt(idEtapaString);
+        mesajServer = "[Server] Introduceti scorul:";
+        out.println(mesajServer);
+        out.flush();
+        String scorString = in.readLine();
+        float scorFloat = Float.parseFloat(scorString);
+        StageDao.insertScore(usernameLogged,scorFloat,idEtapaInt,Singleton.getConnection());
+        mesajServer = "[Server] Scorul a fost introdus!";
     }
     public void iesire() throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));

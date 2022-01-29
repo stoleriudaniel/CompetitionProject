@@ -16,6 +16,7 @@ class ClientThread extends Thread {
     private boolean autentificat=false;
     private boolean welcomeMessageIsPrinted=false;
     private String usernameLogged="";
+    private boolean adminLogged = false;
     private String welcomeMessage = "[Server] Bun venit! Introduceti comanda de INREGISTRARE, AUTENTIFICARE sau IESIRE:";
     public ClientThread (Socket socket) throws IOException { this.socket = socket ; }
     public void run () {
@@ -61,6 +62,9 @@ class ClientThread extends Thread {
         }
         else if(autentificat && command.equals("INSERARE_SCOR")){
             inserareScor();
+        }
+        else if(autentificat && adminLogged && command.equals("INSERARE_NR_ETAPE")){
+            inserareNrEtape();
         }
         else if(command.equals("IESIRE")){
             iesire();
@@ -110,7 +114,14 @@ class ClientThread extends Thread {
         out.flush();
         String password = in.readLine();
         if(PersonDao.isValidAccount(username,password,Singleton.getConnection())) {
-            mesajServer = "[Server] Autentificat cu succes!";
+            mesajServer = "[Server] Autentificat cu succes ca si participant!";
+            autentificat=true;
+            usernameLogged=username;
+        } else if (PersonDao.isAdmin(username,password,Singleton.getConnection())){
+            mesajServer = "[Server] Autentificat cu succes ca si admin!";
+            adminLogged=true;
+            autentificat=true;
+            usernameLogged=username;
         } else {
             mesajServer = "[Server] Autentificare esuata! Introduceti comanda de INREGISTRARE, AUTENTIFICARE sau IESIRE:";
         }
@@ -126,6 +137,18 @@ class ClientThread extends Thread {
         out.println(mesajServer);
         out.flush();
     }
+    public void inserareNrEtape() throws IOException {
+        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        PrintWriter out = new PrintWriter(socket.getOutputStream());
+        String mesajServer = "[Server] Introduceti numarul de etape:";
+        out.println(mesajServer);
+        out.flush();
+        String nrEtapeString = in.readLine();
+        int nrEtapeInt = Integer.parseInt(nrEtapeString);
+        for(int indexEtapa=1; indexEtapa<=nrEtapeInt; indexEtapa++){
+            StageDao.insertPersons(Singleton.getConnection(),indexEtapa);
+        }
+    }
     public void inserareScor() throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         PrintWriter out = new PrintWriter(socket.getOutputStream());
@@ -139,8 +162,14 @@ class ClientThread extends Thread {
         out.flush();
         String scorString = in.readLine();
         float scorFloat = Float.parseFloat(scorString);
-        StageDao.insertScore(usernameLogged,scorFloat,idEtapaInt,Singleton.getConnection());
-        mesajServer = "[Server] Scorul a fost introdus!";
+        if(!StageDao.scorDejaInserat(usernameLogged,idEtapaInt,Singleton.getConnection())) {
+            StageDao.insertScore(usernameLogged, scorFloat, idEtapaInt, Singleton.getConnection());
+            mesajServer = "[Server] Scorul a fost introdus!";
+        } else {
+            mesajServer = "[Server] Scorul este deja introdus si nu poate fi modificat!";
+        }
+        out.println(mesajServer);
+        out.flush();
     }
     public void iesire() throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));

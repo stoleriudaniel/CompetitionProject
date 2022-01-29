@@ -6,7 +6,7 @@ public class Person {
     private String userName;
     private String password;
     private int punctajAles;
-    private int punctajTotal;
+    private float punctajTotal;
     private int loc;
 
     public Person(){}
@@ -18,6 +18,10 @@ public class Person {
         this.id=id;
         this.userName=userName;
         this.idEchipa=idEchipa;
+    }
+    public Person(String userName, float punctaj){
+        this.userName=userName;
+        this.punctajTotal=punctaj;
     }
 
     public void setId(int id) {
@@ -36,6 +40,10 @@ public class Person {
         this.userName = userName;
     }
 
+    public void setPunctajTotal(float punctajTotal) {
+        this.punctajTotal = punctajTotal;
+    }
+
     public int getId() {
         return id;
     }
@@ -46,6 +54,10 @@ public class Person {
 
     public int getLoc() {
         return loc;
+    }
+
+    public float getPunctajTotal() {
+        return punctajTotal;
     }
 
     public String getUserName() {

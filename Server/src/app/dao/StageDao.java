@@ -1,5 +1,6 @@
 package app.dao;
 
+import app.Singleton;
 import app.model.Person;
 
 import java.sql.*;
@@ -7,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StageDao {
+    private static int stagesNo=0;
     private static String sqlInsertPerson = "INSERT INTO clasament_etapa(username, id_etapa) VALUES(?,?);";
     private static String sqlInsertScore = "UPDATE clasament_etapa SET scor=? WHERE (username=? AND id_etapa=?);";
     public static void insertPersons(Connection conn, int idEtapa){
@@ -67,6 +69,93 @@ public class StageDao {
         }
         return value;
     }
+    public static void insertPersonsInClasamentFinal(Connection conn){
+        try{
+            List<Person> persons = PersonDao.read(conn);
+            for(Person person : persons) {
+                PreparedStatement stmt = conn.prepareStatement("INSERT INTO clasament_final(id_persoana, username, id_echipa) VALUES(?,?,?);");
+                stmt.setInt(1,person.getId());
+                stmt.setString(2, person.getUserName());
+                stmt.setInt(3,person.getIdEchipa());
+                stmt.execute();
+            }
+            conn.close();
+        } catch (SQLException e) {
+            System.out.println("Exceptie la insertPersons!\n");
+        }
+    }
+    public static void initClasamentFinal(Connection conn){
+        try{
+            PreparedStatement stmt = conn.prepareStatement("DELETE FROM clasament_final;");
+            stmt.execute();
+            conn.close();
+        } catch (SQLException e) {
+            System.out.println("Exceptie la initClasamentFinal!" + e);
+        }
+    }
+
+    public static void updateClasamentFinal(int idEtapa, Connection conn){
+        try{
+            System.out.println("UpdateClasamentFinal");
+            List<Float> punctaje = new ArrayList<>();
+            List<Integer> locuri = new ArrayList<>();
+            List<String> usernameList = new ArrayList<>();
+            Statement statement = conn.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT username, punctaj_primit FROM clasament_etapa WHERE id_etapa="+idEtapa+";");
+            while (resultSet.next()) {
+                String username = resultSet.getString("username");
+                float punctajPrimit = resultSet.getFloat("punctaj_primit");
+                usernameList.add(username);
+                punctaje.add(punctajPrimit);
+            }
+            ResultSet resultSet2 = statement.executeQuery("SELECT username, punctaj FROM clasament_final;");
+            List<Person> personList = new ArrayList<>();
+            System.out.println("username, punctaj from clasament_final");
+            while(resultSet2.next()){
+                String username = resultSet2.getString("username");
+                float punctaj = resultSet2.getFloat("punctaj");
+                System.out.println("username= "+username + " punctaj=" + punctaj);
+                personList.add(new Person(username,punctaj));
+            }
+            boolean terminat=false;
+            float punctajMaxim=-1;
+            int locNou=0;
+            for(int index=0; index<punctaje.size(); index++){
+                locuri.add(0);
+            }
+            while(!terminat){
+                locNou++;
+                System.out.println("locNou="+locNou);
+                punctajMaxim=-1;
+                terminat=true;
+                for(int index=0; index<punctaje.size(); index++){
+                    if(locuri.get(index)==0 && punctajMaxim<punctaje.get(index)){
+                        punctajMaxim=punctaje.get(index);
+                        terminat=false;
+                    }
+                }
+                for(int index=0; index<punctaje.size(); index++){
+                    if(locuri.get(index)==0 && punctajMaxim==punctaje.get(index)){
+                         locuri.set(index,locNou);
+                    }
+                }
+            }
+            System.out.println("after sort:");
+            for(int index=0; index<punctaje.size(); index++){
+                for(Person person : personList) {
+                    if(person.getUserName().equals(usernameList.get(index))) {
+                        PreparedStatement stmt1 = conn.prepareStatement("UPDATE clasament_final SET loc=" + (locuri.get(index)) + ", punctaj="+(punctaje.get(index)+person.getPunctajTotal())+" WHERE username='" + (usernameList.get(index)) + "';");
+                        stmt1.execute();
+                    }
+                }
+            }
+            for(int index=0; index<locuri.size(); index++){
+                System.out.println("loc= "+locuri.get(index));
+            }
+        } catch (Exception e){
+            System.out.println("Exception fct scorDejaInserat\n" + e);
+        }
+    }
     public static void generareLocuri(Connection conn, int idEtapa){
         boolean terminat=false;
         List<Integer> punctaje = new ArrayList<>();
@@ -107,5 +196,13 @@ public class StageDao {
                 System.out.println("Exception fct toateScorurileSuntInserate e="+e);
             }
         }
+    }
+
+    public static void setStagesNo(int stagesNo) {
+        StageDao.stagesNo = stagesNo;
+    }
+
+    public static int getStagesNo() {
+        return stagesNo;
     }
 }

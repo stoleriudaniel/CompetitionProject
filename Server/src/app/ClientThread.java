@@ -67,6 +67,9 @@ class ClientThread extends Thread {
         else if(autentificat && adminLogged && command.equals("INSERARE_NR_ETAPE")){
             inserareNrEtape();
         }
+        else if(autentificat && adminLogged && command.equals("CLASAMENT_ETAPA")){
+            clasamentEtapa();
+        }
         else if(autentificat && adminLogged && command.equals("CLASAMENT_FINAL")){
             clasamentFinal();
         }
@@ -138,6 +141,7 @@ class ClientThread extends Thread {
         String mesajServer = "[Server] Delogat cu succes! Introduceti comanda:";
         autentificat=false;
         usernameLogged="";
+        adminLogged=false;
         out.println(mesajServer);
         out.flush();
     }
@@ -149,22 +153,47 @@ class ClientThread extends Thread {
         out.flush();
         String nrEtapeString = in.readLine();
         int nrEtapeInt = Integer.parseInt(nrEtapeString);
+        StageDao.setStagesNo(nrEtapeInt);
         for(int indexEtapa=1; indexEtapa<=nrEtapeInt; indexEtapa++){
             StageDao.insertPersons(Singleton.getConnection(),indexEtapa);
         }
+        mesajServer = "[Server] Inserarea a avut succes!";
+        out.println(mesajServer);
+        out.flush();
+    }
+    public void clasamentEtapa() throws IOException {
+        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        PrintWriter out = new PrintWriter(socket.getOutputStream());
+        String mesajServer = "[Server] ";
+        int etapeActualizate=0;
+        for(int i=1; i<=StageDao.getStagesNo(); i++) {
+            if (StageDao.toateScorurileSuntInserate(i, Singleton.getConnection())) {
+                etapeActualizate++;
+                StageDao.generareLocuri(Singleton.getConnection(), i);
+            }
+        }
+        if(etapeActualizate>0){
+            mesajServer = mesajServer + "Au fost actualizate " + etapeActualizate + " etape.";
+        } else {
+            mesajServer = mesajServer + "Nu a fost actualizata nicio etapa.";
+        }
+        out.println(mesajServer);
+        out.flush();
     }
     public void clasamentFinal() throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         PrintWriter out = new PrintWriter(socket.getOutputStream());
-        boolean value1 = StageDao.toateScorurileSuntInserate(1,Singleton.getConnection());
-        boolean value2 = StageDao.toateScorurileSuntInserate(2,Singleton.getConnection());
-        String values = "value1="+value1+" value2="+value2;
-        String mesajServer = "[Server] clasament_final:" + values;
-        for(int i=1; i<=2; i++) {
-            if (StageDao.toateScorurileSuntInserate(i, Singleton.getConnection())) {
-                StageDao.generareLocuri(Singleton.getConnection(), i);
+        StageDao.initClasamentFinal(Singleton.getConnection());
+        StageDao.insertPersonsInClasamentFinal(Singleton.getConnection());
+        StageDao.setStagesNo(2);
+        System.out.println("stages:" + StageDao.getStagesNo());
+        for(int etapa=1; etapa<=StageDao.getStagesNo(); etapa++) {
+            System.out.println("Etapa="+etapa+"boolean: " + StageDao.toateScorurileSuntInserate(etapa, Singleton.getConnection()));
+            if(StageDao.toateScorurileSuntInserate(etapa, Singleton.getConnection())) {
+                StageDao.updateClasamentFinal(etapa, Singleton.getConnection());
             }
         }
+        String mesajServer = "[Server] Actualizat cu succes!";
         out.println(mesajServer);
         out.flush();
     }

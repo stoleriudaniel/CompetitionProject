@@ -45,7 +45,6 @@ public class StageDao {
             ResultSet resultSet = statement.executeQuery("SELECT scor FROM clasament_etapa WHERE (username='"+username+"' AND id_etapa="+idEtapa+");");
             while (resultSet.next()) {
                 if(resultSet.getInt("scor")==0){
-                    System.out.println("resultSet score=" + resultSet.getInt("scor"));
                     value=false;
                 }
             }
@@ -96,7 +95,6 @@ public class StageDao {
 
     public static void updateClasamentFinal(int idEtapa, Connection conn){
         try{
-            System.out.println("UpdateClasamentFinal");
             List<Float> punctaje = new ArrayList<>();
             List<Integer> locuri = new ArrayList<>();
             List<String> usernameList = new ArrayList<>();
@@ -110,11 +108,9 @@ public class StageDao {
             }
             ResultSet resultSet2 = statement.executeQuery("SELECT username, punctaj FROM clasament_final;");
             List<Person> personList = new ArrayList<>();
-            System.out.println("username, punctaj from clasament_final");
             while(resultSet2.next()){
                 String username = resultSet2.getString("username");
                 float punctaj = resultSet2.getFloat("punctaj");
-                System.out.println("username= "+username + " punctaj=" + punctaj);
                 personList.add(new Person(username,punctaj));
             }
             boolean terminat=false;
@@ -125,7 +121,6 @@ public class StageDao {
             }
             while(!terminat){
                 locNou++;
-                System.out.println("locNou="+locNou);
                 punctajMaxim=-1;
                 terminat=true;
                 for(int index=0; index<punctaje.size(); index++){
@@ -140,7 +135,6 @@ public class StageDao {
                     }
                 }
             }
-            System.out.println("after sort:");
             for(int index=0; index<punctaje.size(); index++){
                 for(Person person : personList) {
                     if(person.getUserName().equals(usernameList.get(index))) {
@@ -148,9 +142,6 @@ public class StageDao {
                         stmt1.execute();
                     }
                 }
-            }
-            for(int index=0; index<locuri.size(); index++){
-                System.out.println("loc= "+locuri.get(index));
             }
         } catch (Exception e){
             System.out.println("Exception fct scorDejaInserat\n" + e);

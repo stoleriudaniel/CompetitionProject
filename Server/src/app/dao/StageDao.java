@@ -3,6 +3,7 @@ package app.dao;
 import app.model.Person;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class StageDao {
@@ -55,15 +56,56 @@ public class StageDao {
         boolean value=true;
         try{
             Statement statement = conn.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT scor, FROM clasament_etapa WHERE id_etapa="+idEtapa+";");
+            ResultSet resultSet = statement.executeQuery("SELECT scor FROM clasament_etapa WHERE id_etapa="+idEtapa+";");
             while (resultSet.next()) {
                 if(resultSet.getInt("scor")==0){
                     value=false;
                 }
             }
         } catch (Exception e){
-            System.out.println("Exception fct toateScorurileSuntInserate\n");
+            System.out.println("Exception fct toateScorurileSuntInserate e="+e);
         }
         return value;
+    }
+    public static void generareLocuri(Connection conn, int idEtapa){
+        boolean terminat=false;
+        List<Integer> punctaje = new ArrayList<>();
+        punctaje.add(10);
+        punctaje.add(6);
+        punctaje.add(3);
+        punctaje.add(1);
+        punctaje.add(0);
+        int persoaneCuScorMaxim=0;
+        int locNou=0;
+        while(!terminat){
+            terminat=true;
+            locNou++;
+            int scorMaxim=-1;
+            try{
+                Statement statement = conn.createStatement();
+                ResultSet resultSet = statement.executeQuery("SELECT username, scor, loc FROM clasament_etapa WHERE id_etapa="+idEtapa+";");
+                while (resultSet.next()) {
+                    int scor=resultSet.getInt("scor");
+                    int loc=resultSet.getInt("loc");
+                    if(scorMaxim<scor && loc==0){
+                        scorMaxim=scor;
+                        persoaneCuScorMaxim=1;
+                        terminat=false;
+                    } else if(scorMaxim==scor && loc==0){
+                        persoaneCuScorMaxim++;
+                    }
+                }
+                float punctajNou=0;
+                if(locNou<=4) {
+                    punctajNou=(float) punctaje.get(locNou - 1) / persoaneCuScorMaxim;
+                } else {
+                    punctajNou=0;
+                }
+                PreparedStatement stmt = conn.prepareStatement("UPDATE clasament_etapa SET punctaj_primit="+punctajNou+", loc="+locNou+" WHERE (scor="+scorMaxim+" AND id_etapa="+idEtapa+");");
+                stmt.execute();
+            } catch (Exception e){
+                System.out.println("Exception fct toateScorurileSuntInserate e="+e);
+            }
+        }
     }
 }

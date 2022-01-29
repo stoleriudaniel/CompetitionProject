@@ -2,6 +2,7 @@ package app;
 
 import app.dao.PersonDao;
 import app.dao.StageDao;
+import app.model.Stage;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -65,6 +66,9 @@ class ClientThread extends Thread {
         }
         else if(autentificat && adminLogged && command.equals("INSERARE_NR_ETAPE")){
             inserareNrEtape();
+        }
+        else if(autentificat && adminLogged && command.equals("CLASAMENT_FINAL")){
+            clasamentFinal();
         }
         else if(command.equals("IESIRE")){
             iesire();
@@ -148,6 +152,21 @@ class ClientThread extends Thread {
         for(int indexEtapa=1; indexEtapa<=nrEtapeInt; indexEtapa++){
             StageDao.insertPersons(Singleton.getConnection(),indexEtapa);
         }
+    }
+    public void clasamentFinal() throws IOException {
+        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        PrintWriter out = new PrintWriter(socket.getOutputStream());
+        boolean value1 = StageDao.toateScorurileSuntInserate(1,Singleton.getConnection());
+        boolean value2 = StageDao.toateScorurileSuntInserate(2,Singleton.getConnection());
+        String values = "value1="+value1+" value2="+value2;
+        String mesajServer = "[Server] clasament_final:" + values;
+        for(int i=1; i<=2; i++) {
+            if (StageDao.toateScorurileSuntInserate(i, Singleton.getConnection())) {
+                StageDao.generareLocuri(Singleton.getConnection(), i);
+            }
+        }
+        out.println(mesajServer);
+        out.flush();
     }
     public void inserareScor() throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));

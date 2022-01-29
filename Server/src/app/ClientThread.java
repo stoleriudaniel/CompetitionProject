@@ -214,7 +214,7 @@ class ClientThread extends Thread {
             StageDao.insertScore(usernameLogged, scorFloat, idEtapaInt, Singleton.getConnection());
             mesajServer = "[Server] Scorul a fost introdus!";
         } else {
-            mesajServer = "[Server] Scorul este deja introdus si nu poate fi modificat!";
+            mesajServer = "[Server] Eroare!";
         }
         out.println(mesajServer);
         out.flush();

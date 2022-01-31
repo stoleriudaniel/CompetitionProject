@@ -254,10 +254,16 @@ class ClientThread extends Thread {
         PrintWriter out = new PrintWriter(socket.getOutputStream());
         String mesajServer = "[Server] Clasamentul final este:\n";
         String clasament = StageDao.getClasamentFinal(Singleton.getConnection());
-        if(clasament.length()>0) {
+        boolean toateEtapeleSuntComplete=true;
+        for(int indexEtapa=1; indexEtapa<=StageDao.getStagesNo(); indexEtapa++){
+            if(!StageDao.toateScorurileSuntInserate(indexEtapa,Singleton.getConnection())){
+                toateEtapeleSuntComplete=false;
+            }
+        }
+        if(clasament.length()>0 && toateEtapeleSuntComplete) {
             mesajServer = mesajServer + clasament + "\nEND";
         } else {
-            mesajServer="[Server] Nu a fost actualizat clasamentul de catre admin sau adminul nu a inserat numarul de etape sau nu exista etape complete.\nEND";
+            mesajServer="[Server] Nu a fost actualizat clasamentul de catre admin sau adminul nu a inserat numarul de etape sau nu toate etapele sunt complete.\nEND";
         }
         out.println(mesajServer);
         out.flush();

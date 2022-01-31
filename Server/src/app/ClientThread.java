@@ -239,9 +239,9 @@ class ClientThread extends Thread {
         float scorFloat = Float.parseFloat(scorString);
         if(!StageDao.scorDejaInserat(usernameLogged,idEtapaInt,Singleton.getConnection())) {
             StageDao.insertScore(usernameLogged, scorFloat, idEtapaInt, Singleton.getConnection());
-            mesajServer = "[Server] Scorul a fost introdus! Introduceti comanda de [INREGISTRARE], [AUTENTIFICARE] sau [IESIRE]";
+            mesajServer = "[Server] Scorul a fost introdus! Introduceti comanda de [IESIRE], [DELOGARE], [INSERARE_SCOR], [AFISARE_CLASAMENT_FINAL]";
         } else {
-            mesajServer = "[Server] Eroare! Scorul a fost introdus deja sau id-ul etapei este gresit. Introduceti comanda de [INREGISTRARE], [AUTENTIFICARE] sau [IESIRE]";
+            mesajServer = "[Server] Eroare! Scorul a fost introdus deja sau id-ul etapei este gresit. Introduceti comanda de [IESIRE], [DELOGARE], [INSERARE_SCOR], [AFISARE_CLASAMENT_FINAL]";
         }
         out.println(mesajServer);
         out.flush();
@@ -274,7 +274,7 @@ class ClientThread extends Thread {
     public void comandaInvalida() throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         PrintWriter out = new PrintWriter(socket.getOutputStream());
-        String mesajServer = "[Server] Comanda invalida! Introduceti comanda de [INREGISTRARE], [AUTENTIFICARE] sau [IESIRE]:";
+        String mesajServer = "[Server] Comanda invalida!";
         out.println(mesajServer);
         out.flush();
     }

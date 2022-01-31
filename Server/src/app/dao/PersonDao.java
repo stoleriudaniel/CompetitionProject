@@ -13,6 +13,18 @@ public class PersonDao {
     private static String sqlInsertUser = "INSERT INTO Persons(username,password,id_echipa) VALUES(?,?,?);";
     private static String sqlRemoveUser = "DELETE FROM Persons WHERE username=?";
     private static String sqlInsertAdmin = "INSERT INTO admin(username, password) VALUES(?,?);";
+    public static void createPersonsTable(Connection conn){
+        try{
+            List<Person> persons = PersonDao.read(conn);
+            for(Person person : persons) {
+                PreparedStatement stmt = conn.prepareStatement("CREATE TABLE IF NOT EXISTS persons (id int, PRIMARY_KEY AUTO_INCREMENT, username varchar(20), password varchar(20), id_echipa INT);");
+                stmt.execute();
+            }
+            conn.close();
+        } catch (SQLException e) {
+            System.out.println("Exceptie la CreateTablePerons!\n");
+        }
+    }
     public static void insert(String userName, String password, int idEchipa, Connection conn){
         try{
             PreparedStatement stmt = conn.prepareStatement(sqlInsertUser);

@@ -199,6 +199,7 @@ public class StageDao {
     }
     public static String getClasamentFinal(Connection conn) {
         String clasament = "";
+        boolean existaRanduri=false;
         try {
             Statement statement = conn.createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT username, punctaj, loc, id_echipa FROM clasament_final;");
@@ -208,9 +209,32 @@ public class StageDao {
                 int locInt = resultSet.getInt("loc");
                 int idEchipaInt = resultSet.getInt("id_echipa");
                 clasament = clasament + "username:" + username + " loc:" + locInt + " punctaj:" + punctajFloat + " idEchipa:" + idEchipaInt+"\n";
+                if(username.length()>0){
+                    existaRanduri=true;
+                }
             }
         } catch (Exception e){
             System.out.println("Exception getClasamentFinal:" + e);
+        }
+        if(!existaRanduri){
+            clasament="";
+        }
+        return clasament;
+    }
+    public static String getClasamentEtapa(int idEtapa, Connection conn) {
+        String clasament = "";
+        try {
+            Statement statement = conn.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT username, punctaj_primit, loc, id_etapa FROM clasament_etapa WHERE id_etapa="+idEtapa+";");
+            while(resultSet.next()){
+                String username = resultSet.getString("username");
+                float punctajFloat = resultSet.getFloat("punctaj_primit");
+                int locInt = resultSet.getInt("loc");
+                int idEtapaInt = resultSet.getInt("id_etapa");
+                clasament = clasament + "username:" + username + " loc:" + locInt + " punctaj_primit:" + punctajFloat + " idEtapa:" + idEtapaInt+"\n";
+            }
+        } catch (Exception e){
+            System.out.println("Exception getClasamentEtapa:" + e);
         }
         return clasament;
     }

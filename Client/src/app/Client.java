@@ -29,7 +29,22 @@ public class Client {
                         }
                         response = response + newLine + "\n";
                     }
-                } else {
+                }
+                else if(request.equals("AFISARE_CLASAMENT_ETAPA")){
+                    String response1 = in.readLine();
+                    System.out.println(response1);
+                    Scanner scanner1 = new Scanner(System.in);
+                    String request1 = scanner1.nextLine();
+                    out.println(request1);
+                    while(true) {
+                        String newLine = in.readLine();
+                        if(newLine.equals("END")){
+                            break;
+                        }
+                        response = response + newLine + "\n";
+                    }
+                }
+                else {
                     response = in.readLine();
                 }
                 System.out.println(response);

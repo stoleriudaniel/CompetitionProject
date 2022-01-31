@@ -67,6 +67,9 @@ class ClientThread extends Thread {
         else if(autentificat && command.equals("AFISARE_CLASAMENT_FINAL")){
             afisareClasamentFinal();
         }
+        else if(autentificat && command.equals("AFISARE_CLASAMENT_ETAPA")){
+            afisareClasamentEtapa();
+        }
         else if(autentificat && adminLogged && command.equals("INSERARE_NR_ETAPE")){
             inserareNrEtape();
         }
@@ -74,10 +77,10 @@ class ClientThread extends Thread {
             startCompetitie();
         }
         else if(autentificat && adminLogged && command.equals("GENERARE_CLASAMENT_ETAPA")){
-            clasamentEtapa();
+            generareClasamentEtapa();
         }
         else if(autentificat && adminLogged && command.equals("GENERARE_CLASAMENT_FINAL")){
-            clasamentFinal();
+            generareClasamentFinal();
         }
         else if(autentificat && adminLogged && command.equals("GOLIRE_PERSOANE")){
             golirePersoane();
@@ -129,11 +132,11 @@ class ClientThread extends Thread {
         out.flush();
         String password = in.readLine();
         if(PersonDao.isValidAccount(username,password,Singleton.getConnection())) {
-            mesajServer = "[Server] Autentificat cu succes ca si participant! Introduceti comanda de [IESIRE], [DELOGARE], [INSERARE_SCOR], [AFISARE_CLASAMENT_FINAL]";
+            mesajServer = "[Server] Autentificat cu succes ca si participant! Introduceti comanda de [IESIRE], [DELOGARE], [INSERARE_SCOR], [AFISARE_CLASAMENT_FINAL], [AFISARE_CLASAMENT_ETAPA]";
             autentificat=true;
             usernameLogged=username;
         } else if (PersonDao.isAdmin(username,password,Singleton.getConnection())){
-            mesajServer = "[Server] Autentificat cu succes ca si admin! Introduceti comanda de [INSERARE_NR_ETAPE], [START_COMPETITIE], [GENERARE_CLASAMENT_ETAPA], [GENERARE_CLASAMENT_FINAL]";
+            mesajServer = "[Server] Autentificat cu succes ca si admin! Introduceti comanda de [INSERARE_NR_ETAPE], [START_COMPETITIE], [GENERARE_CLASAMENT_ETAPA], [GENERARE_CLASAMENT_FINAL], [AFISARE_CLASAMENT_FINAL], [AFISARE_CLASAMENT_ETAPA]";
             adminLogged=true;
             autentificat=true;
             usernameLogged=username;
@@ -165,7 +168,7 @@ class ClientThread extends Thread {
 //        for(int indexEtapa=1; indexEtapa<=nrEtapeInt; indexEtapa++){
 //            StageDao.insertPersons(Singleton.getConnection(),indexEtapa);
 //        }
-        mesajServer = "[Server] Inserarea a avut succes! Introduceti comanda de [INSERARE_NR_ETAPE], [START_COMPETITIE], [GENERARE_CLASAMENT_ETAPA], [GENERARE_CLASAMENT_FINAL], [GOLIRE_PERSOANE]";
+        mesajServer = "[Server] Inserarea a avut succes! Introduceti comanda de [INSERARE_NR_ETAPE], [START_COMPETITIE], [GENERARE_CLASAMENT_ETAPA], [GENERARE_CLASAMENT_FINAL], [GOLIRE_PERSOANE], [AFISARE_CLASAMENT_ETAPA], [AFISARE_CLASAMENT_FINAL]";
         out.println(mesajServer);
         out.flush();
     }
@@ -177,7 +180,7 @@ class ClientThread extends Thread {
             mesajServer = mesajServer + "Eroare. Numarul de etape este 0. Setati numarul de etape folosind comanda [INSERARE_NR_ETAPE].";
         }
         else {
-            mesajServer = mesajServer + "Competitia a inceput. Asteptam ca participantii sa isi introduca scorul. Introduceti comanda de [INSERARE_NR_ETAPE], [START_COMPETITIE], [GENERARE_CLASAMENT_ETAPA], [GENERARE_CLASAMENT_FINAL]";
+            mesajServer = mesajServer + "Competitia a inceput. Asteptam ca participantii sa isi introduca scorul. Introduceti comanda de [INSERARE_NR_ETAPE], [START_COMPETITIE], [GENERARE_CLASAMENT_ETAPA], [GENERARE_CLASAMENT_FINAL], [AFISARE_CLASAMENT_ETAPA], [AFISARE_CLASAMENT_FINAL]";
             // golim tabelele clasament_etapa si clasament_final pentru noua competitie
             StageDao.initClasamentEtapa(Singleton.getConnection());
             StageDao.initClasamentFinal(Singleton.getConnection());
@@ -189,7 +192,7 @@ class ClientThread extends Thread {
         out.println(mesajServer);
         out.flush();
     }
-    public void clasamentEtapa() throws IOException {
+    public void generareClasamentEtapa() throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         PrintWriter out = new PrintWriter(socket.getOutputStream());
         String mesajServer = "[Server] ";
@@ -201,14 +204,14 @@ class ClientThread extends Thread {
             }
         }
         if(etapeActualizate>0){
-            mesajServer = mesajServer + "Au fost actualizate " + etapeActualizate + " etape. Introduceti comanda de [INSERARE_NR_ETAPE], [START_COMPETITIE], [GENERARE_CLASAMENT_ETAPA], [GENERARE_CLASAMENT_FINAL], [GOLIRE_PERSOANE]";
+            mesajServer = mesajServer + "Au fost actualizate " + etapeActualizate + " etape. Introduceti comanda de [INSERARE_NR_ETAPE], [START_COMPETITIE], [GENERARE_CLASAMENT_ETAPA], [GENERARE_CLASAMENT_FINAL], [GOLIRE_PERSOANE], [AFISARE_CLASAMENT_ETAPA], [AFISARE_CLASAMENT_FINAL]";
         } else {
-            mesajServer = mesajServer + "Nu a fost actualizata nicio etapa. Introduceti comanda de [INSERARE_NR_ETAPE], [START_COMPETITIE], [GENERARE_CLASAMENT_ETAPA], [GENERARE_CLASAMENT_FINAL], [GOLIRE_PERSOANE]";
+            mesajServer = mesajServer + "Nu a fost actualizata nicio etapa. Introduceti comanda de [INSERARE_NR_ETAPE], [START_COMPETITIE], [GENERARE_CLASAMENT_ETAPA], [GENERARE_CLASAMENT_FINAL], [GOLIRE_PERSOANE], [AFISARE_CLASAMENT_ETAPA], [AFISARE_CLASAMENT_FINAL]";
         }
         out.println(mesajServer);
         out.flush();
     }
-    public void clasamentFinal() throws IOException {
+    public void generareClasamentFinal() throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         PrintWriter out = new PrintWriter(socket.getOutputStream());
         StageDao.initClasamentFinal(Singleton.getConnection());
@@ -220,7 +223,7 @@ class ClientThread extends Thread {
                 StageDao.updateClasamentFinal(etapa, Singleton.getConnection());
             }
         }
-        String mesajServer = "[Server] Actualizat cu succes! Introduceti comanda de [INSERARE_NR_ETAPE], [START_COMPETITIE], [GENERARE_CLASAMENT_ETAPA], [GENERARE_CLASAMENT_FINAL], [GOLIRE_PERSOANE]";
+        String mesajServer = "[Server] Actualizat cu succes! Introduceti comanda de [INSERARE_NR_ETAPE], [START_COMPETITIE], [GENERARE_CLASAMENT_ETAPA], [GENERARE_CLASAMENT_FINAL], [GOLIRE_PERSOANE], [AFISARE_CLASAMENT_ETAPA], [AFISARE_CLASAMENT_FINAL]";
         out.println(mesajServer);
         out.flush();
     }
@@ -239,9 +242,9 @@ class ClientThread extends Thread {
         float scorFloat = Float.parseFloat(scorString);
         if(!StageDao.scorDejaInserat(usernameLogged,idEtapaInt,Singleton.getConnection())) {
             StageDao.insertScore(usernameLogged, scorFloat, idEtapaInt, Singleton.getConnection());
-            mesajServer = "[Server] Scorul a fost introdus! Introduceti comanda de [IESIRE], [DELOGARE], [INSERARE_SCOR], [AFISARE_CLASAMENT_FINAL]";
+            mesajServer = "[Server] Scorul a fost introdus! Introduceti comanda de [IESIRE], [DELOGARE], [INSERARE_SCOR], [AFISARE_CLASAMENT_FINAL], [AFISARE_CLASAMENT_ETAPA]";
         } else {
-            mesajServer = "[Server] Eroare! Scorul a fost introdus deja sau id-ul etapei este gresit. Introduceti comanda de [IESIRE], [DELOGARE], [INSERARE_SCOR], [AFISARE_CLASAMENT_FINAL]";
+            mesajServer = "[Server] Eroare! Scorul a fost introdus deja sau id-ul etapei este gresit. Introduceti comanda de [IESIRE], [DELOGARE], [INSERARE_SCOR], [AFISARE_CLASAMENT_FINAL], [AFISARE_CLASAMENT_ETAPA]";
         }
         out.println(mesajServer);
         out.flush();
@@ -251,14 +254,36 @@ class ClientThread extends Thread {
         PrintWriter out = new PrintWriter(socket.getOutputStream());
         String mesajServer = "[Server] Clasamentul final este:\n";
         String clasament = StageDao.getClasamentFinal(Singleton.getConnection());
-        mesajServer = mesajServer + clasament + "\nEND";
+        if(clasament.length()>0) {
+            mesajServer = mesajServer + clasament + "\nEND";
+        } else {
+            mesajServer="[Server] Nu a fost actualizat clasamentul de catre admin sau adminul nu a inserat numarul de etape sau nu exista etape complete.\nEND";
+        }
+        out.println(mesajServer);
+        out.flush();
+    }
+    public void afisareClasamentEtapa() throws IOException {
+        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        PrintWriter out = new PrintWriter(socket.getOutputStream());
+        String mesajServer = "[Server] Introdu id-ul etapei:";
+        out.println(mesajServer);
+        out.flush();
+        String idEtapa = in.readLine();
+        int idEtapaInt = Integer.parseInt(idEtapa);
+        if(StageDao.toateScorurileSuntInserate(idEtapaInt, Singleton.getConnection())) {
+            mesajServer = "[Server] Clasamentul etapa dupa id-ul " + idEtapa + " este:\n";
+            String clasament = StageDao.getClasamentEtapa(idEtapaInt, Singleton.getConnection());
+            mesajServer = mesajServer + clasament + "\nEND";
+        } else {
+            mesajServer = "[Server] Nu a fost actualizat clasamentul de catre admin sau adminul nu a introdus numarul de etape sau nu sunt toate scorurile inserate.\nEND";
+        }
         out.println(mesajServer);
         out.flush();
     }
     public void golirePersoane() throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         PrintWriter out = new PrintWriter(socket.getOutputStream());
-        String mesajServer = "[Server] Toate conturile au fost sterse! Introduceti comanda de [INSERARE_NR_ETAPE], [START_COMPETITIE], [GENERARE_CLASAMENT_ETAPA], [GENERARE_CLASAMENT_FINAL], [GOLIRE_PERSOANE]";
+        String mesajServer = "[Server] Toate conturile au fost sterse! Introduceti comanda de [INSERARE_NR_ETAPE], [START_COMPETITIE], [GENERARE_CLASAMENT_ETAPA], [GENERARE_CLASAMENT_FINAL], [GOLIRE_PERSOANE], [AFISARE_CLASAMENT_ETAPA], [AFISARE_CLASAMENT_FINAL]";
         PersonDao.clear(Singleton.getConnection());
         out.println(mesajServer);
         out.flush();

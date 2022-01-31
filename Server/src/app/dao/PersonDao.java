@@ -35,6 +35,15 @@ public class PersonDao {
             System.out.println("Stergere esuata!\n");
         }
     }
+    public static void clear(Connection conn){
+        try{
+            PreparedStatement stmt = conn.prepareStatement("DELETE FROM persons");
+            stmt.execute();
+            conn.close();
+        } catch (SQLException e) {
+            System.out.println("Stergere esuata!\n");
+        }
+    }
     public static List<Person> read(Connection conn){
         List<Person> persons = new ArrayList<>();
         try {

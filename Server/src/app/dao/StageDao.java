@@ -11,6 +11,7 @@ public class StageDao {
     private static int stagesNo=0;
     private static String sqlInsertPerson = "INSERT INTO clasament_etapa(username, id_etapa) VALUES(?,?);";
     private static String sqlInsertScore = "UPDATE clasament_etapa SET scor=? WHERE (username=? AND id_etapa=?);";
+    //------INSERT-----
     public static void insertPersons(Connection conn, int idEtapa){
         try{
             List<Person> persons = PersonDao.read(conn);
@@ -38,36 +39,6 @@ public class StageDao {
             System.out.println("Exceptie la insertScore!\n");
         }
     }
-    public static boolean scorDejaInserat(String username, int idEtapa, Connection conn){
-        boolean value=true;
-        try{
-            Statement statement = conn.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT scor FROM clasament_etapa WHERE (username='"+username+"' AND id_etapa="+idEtapa+");");
-            while (resultSet.next()) {
-                if(resultSet.getInt("scor")==0){
-                    value=false;
-                }
-            }
-        } catch (Exception e){
-            System.out.println("Exception fct scorDejaInserat\n" + e);
-        }
-        return value;
-    }
-    public static boolean toateScorurileSuntInserate(int idEtapa, Connection conn){
-        boolean value=true;
-        try{
-            Statement statement = conn.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT scor FROM clasament_etapa WHERE id_etapa="+idEtapa+";");
-            while (resultSet.next()) {
-                if(resultSet.getInt("scor")==0){
-                    value=false;
-                }
-            }
-        } catch (Exception e){
-            System.out.println("Exception fct toateScorurileSuntInserate e="+e);
-        }
-        return value;
-    }
     public static void insertPersonsInClasamentFinal(Connection conn){
         try{
             List<Person> persons = PersonDao.read(conn);
@@ -83,6 +54,8 @@ public class StageDao {
             System.out.println("Exceptie la insertPersons!\n");
         }
     }
+
+    //---------DELETE--------
     public static void initClasamentFinal(Connection conn){
         try{
             PreparedStatement stmt = conn.prepareStatement("DELETE FROM clasament_final;");
@@ -101,7 +74,7 @@ public class StageDao {
             System.out.println("Exceptie la initClasamentEtapa!" + e);
         }
     }
-
+    //--------UPDATE---------
     public static void updateClasamentFinal(int idEtapa, Connection conn){
         try{
             List<Float> punctaje = new ArrayList<>();
@@ -196,6 +169,36 @@ public class StageDao {
                 System.out.println("Exception fct toateScorurileSuntInserate e="+e);
             }
         }
+    }
+    public static boolean scorDejaInserat(String username, int idEtapa, Connection conn){
+        boolean value=true;
+        try{
+            Statement statement = conn.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT scor FROM clasament_etapa WHERE (username='"+username+"' AND id_etapa="+idEtapa+");");
+            while (resultSet.next()) {
+                if(resultSet.getInt("scor")==0){
+                    value=false;
+                }
+            }
+        } catch (Exception e){
+            System.out.println("Exception fct scorDejaInserat\n" + e);
+        }
+        return value;
+    }
+    public static boolean toateScorurileSuntInserate(int idEtapa, Connection conn){
+        boolean value=true;
+        try{
+            Statement statement = conn.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT scor FROM clasament_etapa WHERE id_etapa="+idEtapa+";");
+            while (resultSet.next()) {
+                if(resultSet.getInt("scor")==0){
+                    value=false;
+                }
+            }
+        } catch (Exception e){
+            System.out.println("Exception fct toateScorurileSuntInserate e="+e);
+        }
+        return value;
     }
     public static String getClasamentFinal(Connection conn) {
         String clasament = "";

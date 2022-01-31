@@ -188,7 +188,23 @@ public class StageDao {
             }
         }
     }
-
+    public static String getClasamentFinal(Connection conn) {
+        String clasament = "";
+        try {
+            Statement statement = conn.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT username, punctaj, loc, id_echipa FROM clasament_final;");
+            while(resultSet.next()){
+                String username = resultSet.getString("username");
+                float punctajFloat = resultSet.getFloat("punctaj");
+                int locInt = resultSet.getInt("loc");
+                int idEchipaInt = resultSet.getInt("id_echipa");
+                clasament = clasament + "username:" + username + " loc:" + locInt + " punctaj:" + punctajFloat + " idEchipa:" + idEchipaInt+"\n";
+            }
+        } catch (Exception e){
+            System.out.println("Exception getClasamentFinal:" + e);
+        }
+        return clasament;
+    }
     public static void setStagesNo(int stagesNo) {
         StageDao.stagesNo = stagesNo;
     }

@@ -18,11 +18,23 @@ public class Client {
                         new PrintWriter(socket.getOutputStream(), true);
                 BufferedReader in = new BufferedReader (
                         new InputStreamReader(socket.getInputStream())) ) {
+            String request = "";
             while(true) {
-                String response = in.readLine();
+                String response = "";
+                if(request.equals("AFISARE_CLASAMENT_FINAL")){
+                    while(true) {
+                        String newLine = in.readLine();
+                        if(newLine.equals("END")){
+                            break;
+                        }
+                        response = response + newLine + "\n";
+                    }
+                } else {
+                    response = in.readLine();
+                }
                 System.out.println(response);
                 Scanner scanner = new Scanner(System.in);
-                String request = scanner.nextLine();
+                request = scanner.nextLine();
                 // Send a request to the server
                 out.println(request);
                 if(request.equals("IESIRE")){

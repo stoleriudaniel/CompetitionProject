@@ -64,6 +64,9 @@ class ClientThread extends Thread {
         else if(autentificat && command.equals("INSERARE_SCOR")){
             inserareScor();
         }
+        else if(autentificat && command.equals("AFISARE_CLASAMENT_FINAL")){
+            afisareClasamentFinal();
+        }
         else if(autentificat && adminLogged && command.equals("INSERARE_NR_ETAPE")){
             inserareNrEtape();
         }
@@ -94,7 +97,6 @@ class ClientThread extends Thread {
         out.flush();
         String idEchipaString = in.readLine();
         int idEchipaInt = Integer.parseInt(idEchipaString);
-        System.out.println("nrMembrii: id=" + idEchipaInt +" " + PersonDao.numarPersoaneEchipa(idEchipaInt,Singleton.getConnection()));
         if(PersonDao.userExists(username, Singleton.getConnection())) {
             mesajServer = "[Server] Inregistrare esuata! Userul exista deja. Introduceti comanda de INREGISTRARE, AUTENTIFICARE sau IESIRE:";
         } else if(password.length()==0){
@@ -185,7 +187,6 @@ class ClientThread extends Thread {
         PrintWriter out = new PrintWriter(socket.getOutputStream());
         StageDao.initClasamentFinal(Singleton.getConnection());
         StageDao.insertPersonsInClasamentFinal(Singleton.getConnection());
-        StageDao.setStagesNo(2);
         System.out.println("stages:" + StageDao.getStagesNo());
         for(int etapa=1; etapa<=StageDao.getStagesNo(); etapa++) {
             System.out.println("Etapa="+etapa+"boolean: " + StageDao.toateScorurileSuntInserate(etapa, Singleton.getConnection()));
@@ -216,6 +217,15 @@ class ClientThread extends Thread {
         } else {
             mesajServer = "[Server] Eroare!";
         }
+        out.println(mesajServer);
+        out.flush();
+    }
+    public void afisareClasamentFinal() throws IOException {
+        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        PrintWriter out = new PrintWriter(socket.getOutputStream());
+        String mesajServer = "[Server] Clasamentul final este:\n";
+        String clasament = StageDao.getClasamentFinal(Singleton.getConnection());
+        mesajServer = mesajServer + clasament + "\nEND";
         out.println(mesajServer);
         out.flush();
     }

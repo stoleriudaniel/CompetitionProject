@@ -92,6 +92,15 @@ public class StageDao {
             System.out.println("Exceptie la initClasamentFinal!" + e);
         }
     }
+    public static void initClasamentEtapa(Connection conn){
+        try{
+            PreparedStatement stmt = conn.prepareStatement("DELETE FROM clasament_etapa;");
+            stmt.execute();
+            conn.close();
+        } catch (SQLException e) {
+            System.out.println("Exceptie la initClasamentEtapa!" + e);
+        }
+    }
 
     public static void updateClasamentFinal(int idEtapa, Connection conn){
         try{

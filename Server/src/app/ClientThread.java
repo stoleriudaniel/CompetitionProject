@@ -70,6 +70,9 @@ class ClientThread extends Thread {
         else if(autentificat && adminLogged && command.equals("INSERARE_NR_ETAPE")){
             inserareNrEtape();
         }
+        else if(autentificat && adminLogged && command.equals("START_COMPETITIE")){
+            startCompetitie();
+        }
         else if(autentificat && adminLogged && command.equals("CLASAMENT_ETAPA")){
             clasamentEtapa();
         }
@@ -156,10 +159,30 @@ class ClientThread extends Thread {
         String nrEtapeString = in.readLine();
         int nrEtapeInt = Integer.parseInt(nrEtapeString);
         StageDao.setStagesNo(nrEtapeInt);
-        for(int indexEtapa=1; indexEtapa<=nrEtapeInt; indexEtapa++){
-            StageDao.insertPersons(Singleton.getConnection(),indexEtapa);
-        }
+//        for(int indexEtapa=1; indexEtapa<=nrEtapeInt; indexEtapa++){
+//            StageDao.insertPersons(Singleton.getConnection(),indexEtapa);
+//        }
         mesajServer = "[Server] Inserarea a avut succes!";
+        out.println(mesajServer);
+        out.flush();
+    }
+    public void startCompetitie() throws IOException {
+        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        PrintWriter out = new PrintWriter(socket.getOutputStream());
+        String mesajServer = "[Server] ";
+        if(StageDao.getStagesNo()==0){
+            mesajServer = mesajServer + "Eroare. Numarul de etape este 0. Setati numarul de etape folosind comanda INSERARE_NR_ETAPE.";
+        }
+        else {
+            mesajServer = mesajServer + "Competitia a inceput. Asteptam ca participantii sa isi introduca scorul.";
+            // golim tabelele clasament_etapa si clasament_final pentru noua competitie
+            StageDao.initClasamentEtapa(Singleton.getConnection());
+            StageDao.initClasamentFinal(Singleton.getConnection());
+            for(int indexEtapa=1; indexEtapa<=StageDao.getStagesNo(); indexEtapa++){
+                //inseram pentru fiecare etapa, persoanele in clasament_etapa pentru ca mai apoi sa isi introduca scorul
+                StageDao.insertPersons(Singleton.getConnection(),indexEtapa);
+            }
+        }
         out.println(mesajServer);
         out.flush();
     }
